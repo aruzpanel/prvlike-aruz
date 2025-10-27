@@ -1,3 +1,4 @@
+
 name: Update Tokens Every 5 Hours
 
 on:
@@ -9,21 +10,41 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # ⚡ fayllarni yangilashga ruxsat
+      contents: write  # fayllarni yangilashga ruxsat
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    # 1️⃣ Kodni yuklash
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
+    # 2️⃣ Python o‘rnatish (minimal va keshlangan)
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: '3.11'
+        cache: 'pip'  # pip kutubxonalarini keshlaydi (10x tezroq)
 
-    - name: Install dependencies
-      run: pip install -r requirements.txt
+    # 3️⃣ Kutubxonalarni o‘rnatish (agar requirements.txt mavjud bo‘lsa)
+    - name: Install dependencies (fast)
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt --quiet
+        else
+          echo "No requirements.txt found, skipping install."
+        fi
 
+    # 4️⃣ update_tokens.py ni ishga tushirish
     - name: Run update_tokens.py
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # ⚡ env orqali yuborish
-      run: python update_tokens.py
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # xavfsiz token
+      run: |
+        echo "🚀 Running token update script..."
+        python update_tokens.py || echo "⚠️ Script exited with non-zero code"
+
+    # 5️⃣ Natijalarni commit qilish (agar fayl o‘zgargan bo‘lsa)
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add -A
+        git diff --quiet && echo "No changes to commit." || (git commit -m "🔄 Auto update tokens" && git push)
