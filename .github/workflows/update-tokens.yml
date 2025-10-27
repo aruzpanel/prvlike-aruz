@@ -1,0 +1,29 @@
+name: Update Tokens Every 5 Hours
+
+on:
+  schedule:
+    - cron: '0 */5 * * *'  # Har 5 soatda
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # ⚡ fayllarni yangilashga ruxsat
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run update_tokens.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # ⚡ env orqali yuborish
+      run: python update_tokens.py
