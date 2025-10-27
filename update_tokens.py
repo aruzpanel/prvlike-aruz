@@ -4,7 +4,7 @@ import requests
 from github import Github
 
 def generate_token(uid, password):
-    url = f"https://jwt-converter-black.vercel.app/token?uid={uid}&password={password}"
+    url = f"https://jwt-aruz.vercel.app/token?uid={uid}&password={password}"
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     g = Github(gh_token)
 
     # repo nomi
-    repo = g.get_repo("makhsudjaan/fflikesforallserver")
+    repo = g.get_repo("aruzpanel/prvlike-aruz")
 
     # bir nechta regionni ishlash
     regions = ["ind", "sg"]   # bu yerga kerakli regionlarni qo‘shib borasiz
